@@ -13,40 +13,7 @@ using namespace Git;
 using namespace ShowLib;
 using namespace ShowLib::SSH;
 
-/**
- * Number of un-pushed local commits.
-int
-numberAhead() {
-    string localRefName = string{"refs/remotes/origin/"} + branchName;
-    string remoteRefName = string{"refs/heads/"} + branchName;
 
-    git_fetch_options fetchOptions = GIT_FETCH_OPTIONS_INIT;
-    fetchOptions.callbacks.credentials = creds;
-
-    int error = git_remote_fetch(origin, nullptr, &fetchOptions, nullptr);
-    if (error) {
-        const git_error * e = git_error_last();
-        cout << "Got an error: " << e->message << endl;
-    }
-
-    git_oid id;
-    git_revwalk *	walker = nullptr;
-    git_revwalk_new(&walker, repository);
-
-    git_revwalk_push_ref(walker, remoteRefName.c_str());
-    git_revwalk_hide_ref(walker, localRefName.c_str());
-
-    while (!git_revwalk_next(&id, walker)) {
-        cout << "Foo." << endl;
-    }
-
-    if (walker != nullptr) {
-        git_revwalk_free(walker);
-    }
-
-    return 0;
-}
- */
 
 //======================================================================
 // Repositories.
@@ -153,6 +120,41 @@ Repository::fetch(Host::Pointer host, const std::string &password) {
 void
 Repository::fetch(const std::string &, const std::string &) {
     cout << "Do an HTTPS-based fetch." << endl;
+}
+
+/**
+ * How many commits are on the server but we don't have?
+ */
+int
+Repository::commitsBehindRemote() {
+    return 0;
+}
+
+/**
+ * How many commits are we ahead of the server?
+ */
+int
+Repository::commitsAheadRemote() {
+    string branchName = currentBranch();
+    string localRefName = string{"refs/remotes/origin/"} + branchName;
+    string remoteRefName = string{"refs/heads/"} + branchName;
+
+    git_oid id;
+    git_revwalk *	walker = nullptr;
+    git_revwalk_new(&walker, repository);
+
+    git_revwalk_push_ref(walker, remoteRefName.c_str());
+    git_revwalk_hide_ref(walker, localRefName.c_str());
+
+    while (!git_revwalk_next(&id, walker)) {
+        cout << "Foo." << endl;
+    }
+
+    if (walker != nullptr) {
+        git_revwalk_free(walker);
+    }
+
+    return 0;
 }
 
 //======================================================================

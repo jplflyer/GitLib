@@ -73,6 +73,8 @@ public:
 
     Remote::Pointer		getRemote();
     std::string			currentBranch();
+    int					commitsBehindRemote();
+    int					commitsAheadRemote();
 
     void				fetch(ShowLib::SSH::Host::Pointer host, const std::string &pw);
     void				fetch(const std::string &username, const std::string &pw);

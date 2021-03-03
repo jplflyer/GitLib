@@ -28,6 +28,10 @@ int main(int, char **) {
          << ". Project: " << uri.getProject()
          << endl;
 
+    cout << "Commits ahead: " << repo.commitsAheadRemote()
+         << ". Behind:" << repo.commitsBehindRemote()
+         << endl;
+
     git_libgit2_shutdown();
     return 0;
 }
