@@ -12,4 +12,3 @@ You might have to do that separately and sudo the install, depending upon whethe
 
 # Building
 I use Qt Creator as my IDE, and you'll see some checked in files related to it. I dislike cmake, so I maintain a Makefile. This builds on Mac and probably under Linux without changes.
-
