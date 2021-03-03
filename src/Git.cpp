@@ -127,7 +127,27 @@ Repository::fetch(const std::string &, const std::string &) {
  */
 int
 Repository::commitsBehindRemote() {
-    return 0;
+    int rv = 0;
+    string branchName = currentBranch();
+    string localRefName = string{"refs/remotes/origin/"} + branchName;
+    string remoteRefName = string{"refs/heads/"} + branchName;
+
+    git_oid id;
+    git_revwalk *	walker = nullptr;
+    git_revwalk_new(&walker, repository);
+
+    git_revwalk_push_ref(walker, localRefName.c_str());
+    git_revwalk_hide_ref(walker, remoteRefName.c_str());
+
+    while (!git_revwalk_next(&id, walker)) {
+        ++rv;
+    }
+
+    if (walker != nullptr) {
+        git_revwalk_free(walker);
+    }
+
+    return rv;
 }
 
 /**
@@ -135,6 +155,7 @@ Repository::commitsBehindRemote() {
  */
 int
 Repository::commitsAheadRemote() {
+    int rv = 0;
     string branchName = currentBranch();
     string localRefName = string{"refs/remotes/origin/"} + branchName;
     string remoteRefName = string{"refs/heads/"} + branchName;
@@ -147,14 +168,14 @@ Repository::commitsAheadRemote() {
     git_revwalk_hide_ref(walker, localRefName.c_str());
 
     while (!git_revwalk_next(&id, walker)) {
-        cout << "Foo." << endl;
+        ++rv;
     }
 
     if (walker != nullptr) {
         git_revwalk_free(walker);
     }
 
-    return 0;
+    return rv;
 }
 
 //======================================================================
