@@ -70,9 +70,6 @@ typedef  std::pair<Host::Pointer, std::string> SSHCredentialsPayload;
 int ssh_creds(git_cred **out, const char *url, const char *username, unsigned int types, void *payloadIn) {
     SSHCredentialsPayload * payload = static_cast<SSHCredentialsPayload *>(payloadIn);
 
-    cout << "Try to get credentials for " << url << ", " << username
-         << ", " << types << endl;
-
     string privKey = payload->first->getIdentityFile();
     string pubKey = privKey + ".pub";
 
@@ -85,7 +82,6 @@ int ssh_creds(git_cred **out, const char *url, const char *username, unsigned in
 }
 
 int basic_creds(git_cred **out, const char *url, const char *username, unsigned int types, void *payload) {
-    cout << "Try to get credentials for " << url << ", " << username << ", " << types << endl;
     int rv = git_credential_ssh_key_from_agent(out, "jpl@showpage.org");
     if (rv) {
         cout << "Error: " << git_error_last()->message << endl;
@@ -99,22 +95,13 @@ Repository::fetch(Host::Pointer host, const std::string &password) {
     payload.first = host;
     payload.second = password;
 
-    cout << "Do an SSH-based fetch."
-         << " With identiy file: " << host->getIdentityFile()
-         << endl;
-
     git_fetch_options fetchOptions = GIT_FETCH_OPTIONS_INIT;
     fetchOptions.callbacks.credentials = ssh_creds;
     fetchOptions.callbacks.payload = &payload;
 
-    cout << "Call fetch." << endl;
     if (git_remote_fetch(getRemote()->gitRemote(), NULL, &fetchOptions, "fetch") < 0) {
         cerr << "Fetch Error: " << git_error_last()->message << endl;
     }
-    else {
-        cout << "Fetch returned safely." << endl;
-    }
-
 }
 
 void

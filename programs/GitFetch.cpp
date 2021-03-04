@@ -38,8 +38,8 @@ int main(int argc, char **argv) {
         Configuration sshConfig;
 
         sshConfig.load();
-        Host::Pointer key = sshConfig.getHost(uri.getHost());
-        repo.fetch(key, password);
+        Host::Pointer host = sshConfig.getHost(uri.getHost());
+        repo.fetch(host, password);
     }
 
     return 0;
