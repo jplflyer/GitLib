@@ -178,6 +178,9 @@ Remote::Remote(Repository &repo) {
     if (!valid) {
         cerr << "Failed to initialize remote." << endl;
     }
+    else {
+        uri.setURL(url());
+    }
 }
 
 /**
@@ -197,8 +200,22 @@ string Remote::url() {
     return git_remote_url(origin);
 }
 
-string Remote::name() {
+/**
+ * This is going to be "origin", as that's the only example I have for the
+ * remote end of a git repo.
+ */
+string Remote::remoteName() {
     return git_remote_name(origin);
+}
+
+/**
+ * We get this from the URI. It's the last part of the URI without the .git
+ * For git@github.com:jplflyer/GitLib.git we'll return GitLib.
+ */
+string Remote::name() {
+    string project = uri.getProject();
+
+    return trimTail(substringAfterLast(project, "/"), ".git");
 }
 
 //======================================================================
@@ -262,6 +279,10 @@ std::string Reference::currentBranch() {
  * Constructor.
  */
 URI::URI(const std::string &value) {
+    setURL(value);
+}
+
+void URI::setURL(const std::string &value) {
     raw = value;
 
     auto parts = ShowLib::splitPair(raw, ":");

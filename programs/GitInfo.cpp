@@ -26,6 +26,7 @@ int main(int, char **) {
          << ". Host: " << uri.getHost()
          << ". User: " << uri.getUsername()
          << ". Project: " << uri.getProject()
+         << ". Name: " << remote->name()
          << endl;
 
     cout << "Commits ahead: " << repo.commitsAheadRemote()

@@ -18,6 +18,37 @@ namespace Git {
 }
 
 /**
+ * Git URLs may or may not resemble other URLs, so I have a special class for it.
+ *
+ * ssh://[user@]server/project.git
+ * [user@]server:project.git
+ * https://example.com[:port]/gitproject.git
+ */
+class Git::URI {
+public:
+    URI() = default;
+    URI(const std::string &);
+
+    void setURL(const std::string &);
+
+    bool isSSH() const { return ssh; }
+    bool isHTTP() const { return http; }
+
+    std::string getRaw() const { return raw; }
+    std::string getHost() const { return host; }
+    std::string getUsername() const { return username; }
+    std::string getProject() const { return project; }
+
+private:
+    std::string		raw;
+    std::string		host;
+    std::string		username;
+    std::string		project;
+    bool			ssh = false;
+    bool			http = false;
+};
+
+/**
  * The remote portion of a local repository.
  */
 class Git::Remote {
@@ -32,10 +63,12 @@ public:
     git_remote *		gitRemote() { return origin; }
 
     std::string url();
+    std::string remoteName();
     std::string name();
 
 private:
     git_remote *		origin = nullptr;
+    URI					uri;
     bool				valid = false;
 };
 
@@ -86,30 +119,3 @@ private:
     bool				valid = false;
 };
 
-/**
- * Git URLs may or may not resemble other URLs, so I have a special class for it.
- *
- * ssh://[user@]server/project.git
- * [user@]server:project.git
- * https://example.com[:port]/gitproject.git
- */
-class Git::URI {
-public:
-    URI(const std::string &);
-
-    bool isSSH() const { return ssh; }
-    bool isHTTP() const { return http; }
-
-    std::string getRaw() const { return raw; }
-    std::string getHost() const { return host; }
-    std::string getUsername() const { return username; }
-    std::string getProject() const { return project; }
-
-private:
-    std::string		raw;
-    std::string		host;
-    std::string		username;
-    std::string		project;
-    bool			ssh = false;
-    bool			http = false;
-};
