@@ -50,6 +50,7 @@ Repository::~Repository() {
  * Get the pointer to the remote server.
  */
 Remote::Pointer Repository::getRemote() {
+    std::unique_lock<std::mutex> lock(myMutex);
     if (remote == nullptr) {
         remote = std::make_shared<Remote>(*this);
     }
@@ -60,6 +61,7 @@ Remote::Pointer Repository::getRemote() {
  * What is our current repository?
  */
 string Repository::currentBranch() {
+    std::unique_lock<std::mutex> lock(myMutex);
     Reference ref(*this);
     return ref.currentBranch();
 
@@ -91,7 +93,10 @@ int basic_creds(git_cred **out, const char *url, const char *username, unsigned 
 
 void
 Repository::fetch(Host::Pointer host, const std::string &password) {
+    git_remote * remoteToUse = getRemote()->gitRemote();
+    std::unique_lock<std::mutex> lock(myMutex);
     SSHCredentialsPayload payload;
+
     payload.first = host;
     payload.second = password;
 
@@ -99,13 +104,14 @@ Repository::fetch(Host::Pointer host, const std::string &password) {
     fetchOptions.callbacks.credentials = ssh_creds;
     fetchOptions.callbacks.payload = &payload;
 
-    if (git_remote_fetch(getRemote()->gitRemote(), NULL, &fetchOptions, "fetch") < 0) {
+    if (git_remote_fetch(remoteToUse, NULL, &fetchOptions, "fetch") < 0) {
         cerr << "Fetch Error: " << git_error_last()->message << endl;
     }
 }
 
 void
 Repository::fetch(const std::string &, const std::string &) {
+    std::unique_lock<std::mutex> lock(myMutex);
     cout << "Do an HTTPS-based fetch." << endl;
 }
 
@@ -119,6 +125,7 @@ Repository::commitsBehindRemote() {
     string localRefName = string{"refs/remotes/origin/"} + branchName;
     string remoteRefName = string{"refs/heads/"} + branchName;
 
+    std::unique_lock<std::mutex> lock(myMutex);
     git_oid id;
     git_revwalk *	walker = nullptr;
     git_revwalk_new(&walker, repository);
@@ -147,6 +154,7 @@ Repository::commitsAheadRemote() {
     string localRefName = string{"refs/remotes/origin/"} + branchName;
     string remoteRefName = string{"refs/heads/"} + branchName;
 
+    std::unique_lock<std::mutex> lock(myMutex);
     git_oid id;
     git_revwalk *	walker = nullptr;
     git_revwalk_new(&walker, repository);

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
+
 #include <git2.h>
 
 #include <showlib/SSHConfiguration.h>
@@ -113,6 +115,7 @@ public:
     void				fetch(const std::string &username, const std::string &pw);
 
 private:
+    std::mutex			myMutex;
     Remote::Pointer		remote = nullptr;
     git_repository *	repository = nullptr;
     std::string			directory;
