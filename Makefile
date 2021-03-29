@@ -26,6 +26,7 @@ INCLUDES += -I. -I./src
 
 LIBS += -l${LIBNAME}
 LIBS += -l${SHOWLIBNAME}
+LIBS += -L/usr/local/opt/openssl/lib
 LIBS += -lgit2 -lcurl -lssh2 -lssl -lz -liconv -lssh2 -lcrypto
 LIBS += -lpthread -lstdc++ -lm -ldl
 LIBS += -framework CoreFoundation -framework Security
